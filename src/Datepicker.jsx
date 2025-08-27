@@ -79,37 +79,86 @@ export default function Datepicker() {
         value={formattedDate}
         onClick={toggleCalendar}
         placeholder="Select date"
-        className="w-40 p-2 border border-gray-300 rounded cursor-pointer focus:outline-none focus:ring-2 focus:ring-blue-500"
+        className="w-44 p-2 border border-gray-300 rounded-md cursor-pointer focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
+        aria-label="Select date"
       />
+
       {showCalendar && (
-        <div className="absolute top-full left-0 mt-2 bg-white border border-gray-300 rounded shadow-lg z-50 p-4">
+        <div className="absolute top-full left-0 mt-2 bg-white border border-gray-200 rounded-lg shadow-xl z-50 p-4 w-64">
           {/* header */}
-          <div className="flex justify-between items-center mb-2">
-            <button onClick={prevMonth} className="p-1 hover:bg-gray-200 rounded">&lt;</button>
-            <span className="font-medium">{currentMonthName} {currentYear}</span>
-            <button onClick={nextMonth} className="p-1 hover:bg-gray-200 rounded">&gt;</button>
+          <div className="flex items-center justify-between mb-3">
+            <button
+              onClick={prevMonth}
+              type="button"
+              className="p-1 rounded hover:bg-gray-100 text-gray-700"
+              aria-label="Previous month"
+            >
+              ‹
+            </button>
+
+            <div className="text-center">
+              <div className="text-sm text-gray-500">{currentYear}</div>
+              <div className="font-semibold text-gray-800">{currentMonthName}</div>
+            </div>
+
+            <button
+              onClick={nextMonth}
+              type="button"
+              className="p-1 rounded hover:bg-gray-100 text-gray-700"
+              aria-label="Next month"
+            >
+              ›
+            </button>
           </div>
+
           {/* weekdays */}
-          <div className="grid grid-cols-7 text-center mb-1">
+          <div className="grid grid-cols-7 text-center mb-2">
             {weekdays.map((d) => (
-              <span key={d} className="font-semibold text-gray-700">{d}</span>
+              <div key={d} className="text-xs font-medium text-gray-500 py-1">{d}</div>
             ))}
           </div>
+
           {/* days */}
-          <div className="grid grid-cols-7 text-center">
+          <div className="grid grid-cols-7 gap-2 text-center">
             {calendarDays.map((day) => {
-              const classes = [
-                'p-2 cursor-pointer rounded-full',
-                day.otherMonth ? 'text-gray-400' : '',
-                isSelected(day) ? 'bg-blue-500 text-white' : '',
-                !day.otherMonth ? 'hover:bg-blue-100' : '',
+              const selected = isSelected(day)
+              const isOther = day.otherMonth
+              const btnClass = [
+                'w-8 h-8 inline-flex items-center justify-center text-sm rounded-full transition',
+                isOther ? 'text-gray-300 hover:text-gray-400' : 'text-gray-700 hover:bg-blue-50',
+                selected ? 'bg-blue-600 text-white shadow' : '',
               ].filter(Boolean).join(' ')
+
               return (
-                <span key={day.date.toISOString()} onClick={() => selectDate(day)} className={classes}>
+                <button
+                  key={day.date.toISOString()}
+                  type="button"
+                  onClick={() => selectDate(day)}
+                  className={btnClass}
+                  aria-current={selected ? 'date' : undefined}
+                  aria-disabled={isOther}
+                  disabled={isOther}
+                >
                   {day.date.getDate()}
-                </span>
+                </button>
               )
             })}
+          </div>
+
+          {/* footer: quick today button */}
+          <div className="mt-3 flex justify-end">
+            <button
+              type="button"
+              onClick={() => {
+                setSelectedDate(new Date())
+                setCurrentMonth(new Date().getMonth())
+                setCurrentYear(new Date().getFullYear())
+                setShowCalendar(false)
+              }}
+              className="text-sm text-blue-600 hover:underline"
+            >
+              Today
+            </button>
           </div>
         </div>
       )}
